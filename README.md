@@ -87,7 +87,7 @@ http://localhost:3000
 ├── app/
 │   └── page.tsx                            # Home page route
 ├── components/
-│   └── Patients/                           # Table to display all patients
+│   └── Patients/
 │       ├── RegisterPatient.tsx             # Form to register patient
 │       └── PatientsTable.tsx               # Table to display all patients
 │       └── PatientsTableWrapper.tsx        # Wrapper for Patients React component
@@ -99,7 +99,7 @@ http://localhost:3000
 ├── lib/
 │   └── db.ts                               # Database connection
 │   └── utils.ts                            # Helper functions
-└── SETUP_INSTRUCTIONS.md                               # You're here!
+└── SETUP_INSTRUCTIONS.md                   # You're here!
 ```
 
 ---
@@ -133,5 +133,3 @@ http://localhost:3000
 🎉 **Modularity**
 
 - **Modular structure** separating components, types, utilities, and logic.
-
----
