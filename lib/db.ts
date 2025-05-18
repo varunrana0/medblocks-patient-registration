@@ -8,7 +8,11 @@ export async function getDbConnection() {
   try {
     if (!db) {
       const isProd = process.env.NODE_ENV === "production";
-      let dbDir = path.join(isProd ? "/tmp" : process.cwd(), "db", "patients");
+      const dbDir = path.join(
+        isProd ? "/tmp" : process.cwd(),
+        "db",
+        "patients"
+      );
 
       if (!existsSync(dbDir)) {
         mkdirSync(dbDir, { recursive: true });
