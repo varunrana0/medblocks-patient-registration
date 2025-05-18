@@ -10,18 +10,16 @@ export async function getDbConnection() {
       const isProd = process.env.NODE_ENV === "production";
 
       let dbDir = path.join(process.cwd(), "db", "patients");
-      let dbPath = path.join(process.cwd(), "db", "patients");
 
       if (isProd) {
         dbDir = path.join("/tmp", "db", "patients");
-        dbPath = `file:${dbDir}`;
       }
 
       if (!existsSync(dbDir)) {
         mkdirSync(dbDir, { recursive: true });
       }
 
-      db = new PGlite(dbPath);
+      db = new PGlite(dbDir);
 
       // const dbpath = path.join(process.cwd(), "db", "patients");
       // if (!existsSync(dbpath)) {
