@@ -6,13 +6,13 @@ import { type Results } from "@electric-sql/pglite";
 import { type Patient } from "@/components/Patients/types";
 import { type TPatientForm } from "@/components/Patients/Patient.schema";
 
-const db = await getDbConnection();
-
 export const registerPatient = async (
   data: TPatientForm,
   medicalConditions: string,
   createdAt: string
 ): Promise<void> => {
+  const db = await getDbConnection();
+
   if (!db) {
     throw new Error("Database connection error");
   }
@@ -64,6 +64,8 @@ export const refreshPatients = async () => {
 
 export const getAllPatients = async () => {
   try {
+    const db = await getDbConnection();
+
     if (!db) {
       throw new Error("Database connection error");
     }
