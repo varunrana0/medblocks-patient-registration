@@ -50,10 +50,10 @@ const RegisterPatients = () => {
   });
 
   useEffect(() => {
-    const broadcaseChannel = new BroadcastChannel(PATIENTS_SYNC_CHANNEL);
-    setChannel(broadcaseChannel);
+    const broadCastChannel = new BroadcastChannel(PATIENTS_SYNC_CHANNEL);
+    setChannel(broadCastChannel);
 
-    broadcaseChannel.onmessage = (event) => {
+    broadCastChannel.onmessage = (event) => {
       if (event.data.type === NEW_PATIENT_REGISTERED) {
         console.log("refreshing patients");
         refreshPatients();

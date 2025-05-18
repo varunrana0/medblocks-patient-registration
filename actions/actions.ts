@@ -3,6 +3,8 @@
 import { getDbConnection } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { TPatientForm } from "@/components/Patients/Patient.schema";
+import { Results } from "@electric-sql/pglite";
+import { Patient } from "@/components/Patients/types";
 
 const db = await getDbConnection();
 
@@ -63,4 +65,19 @@ export const registerPatient = async (
 
 export const refreshPatients = async () => {
   revalidatePath("/");
+};
+
+export const getAllPatients = async () => {
+  try {
+    if (!db) throw new Error("DB not initialized");
+
+    const result: Results<Patient> = await db.query(
+      "SELECT * FROM patients ORDER BY createdAt DESC;"
+    );
+
+    console.log("Fetched patients:", result.rows);
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching patients:", error);
+  }
 };
