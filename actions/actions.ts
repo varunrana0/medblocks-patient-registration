@@ -2,9 +2,9 @@
 
 import { getDbConnection } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { TPatientForm } from "@/components/Patients/Patient.schema";
-import { Results } from "@electric-sql/pglite";
-import { Patient } from "@/components/Patients/types";
+import { type Results } from "@electric-sql/pglite";
+import { type Patient } from "@/components/Patients/types";
+import { type TPatientForm } from "@/components/Patients/Patient.schema";
 
 const db = await getDbConnection();
 
@@ -14,7 +14,6 @@ export const registerPatient = async (
   createdAt: string
 ): Promise<void> => {
   if (!db) {
-    console.error("Database connection is not initialized.");
     throw new Error("Database connection error");
   }
 
@@ -55,10 +54,6 @@ export const registerPatient = async (
     await db.query(insertQuery, values);
     revalidatePath("/");
   } catch (error) {
-    console.error("Failed to register patient:", {
-      message: (error as Error).message,
-      stack: (error as Error).stack,
-    });
     throw new Error("Failed to register patient");
   }
 };
@@ -69,15 +64,20 @@ export const refreshPatients = async () => {
 
 export const getAllPatients = async () => {
   try {
-    if (!db) throw new Error("DB not initialized");
+    if (!db) {
+      throw new Error("Database connection error");
+    }
 
     const result: Results<Patient> = await db.query(
       "SELECT * FROM patients ORDER BY createdAt DESC;"
     );
 
-    console.log("Fetched patients:", result.rows);
+    if (!result) {
+      throw new Error("Failed to fetch patients");
+    }
+
     return result.rows;
   } catch (error) {
-    console.error("Error fetching patients:", error);
+    throw new Error("Failed to fetch patients");
   }
 };

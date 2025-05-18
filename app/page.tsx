@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import RegisterPatients from "@/components/Patients/RegisterPatients";
 import PatientsTableWrapper from "@/components/Patients/PatientsTableWrapper";
 
@@ -12,12 +11,8 @@ export default function Home() {
       {/*  Register Patients to the system */}
       <RegisterPatients />
 
-      {/* List of Patients */}
-      <Suspense
-        fallback={<div className="text-center p-6">Loading patients...</div>}
-      >
-        <PatientsTableWrapper />
-      </Suspense>
+      {/* Patients Records */}
+      <PatientsTableWrapper />
     </main>
   );
 }

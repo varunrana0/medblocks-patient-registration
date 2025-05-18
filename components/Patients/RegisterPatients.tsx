@@ -29,14 +29,18 @@ import {
   NEW_PATIENT_REGISTERED,
   PATIENTS_SYNC_CHANNEL,
 } from "./constant";
+import { toast } from "sonner";
 
-const ErrorMessage = ({ message }: { message?: string }) => {
-  return message ? <p className="text-sm text-red-500">{message}</p> : null;
+const ErrorMessage = ({ message, id }: { message?: string; id: string }) => {
+  return message ? (
+    <p id={id} className="text-sm text-red-500" role="alert" aria-live="polite">
+      {message}
+    </p>
+  ) : null;
 };
 
 const RegisterPatients = () => {
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [channel, setChannel] = useState<BroadcastChannel | null>(null);
 
   const {
@@ -55,7 +59,6 @@ const RegisterPatients = () => {
 
     broadCastChannel.onmessage = (event) => {
       if (event.data.type === NEW_PATIENT_REGISTERED) {
-        console.log("refreshing patients");
         refreshPatients();
       }
     };
@@ -73,11 +76,17 @@ const RegisterPatients = () => {
 
       await registerPatient(data, medicalConditions, createdAt);
       channel?.postMessage({ type: NEW_PATIENT_REGISTERED });
+
       reset();
       setOpen(false);
+      toast.success("Patient registered successfully");
     } catch (err) {
-      console.error("Error saving patient:", err);
-      setError("Failed to save patient. Please try again.");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to register patient";
+
+      reset();
+      setOpen(false);
+      toast.error(errorMessage);
     }
   };
 
@@ -87,33 +96,74 @@ const RegisterPatients = () => {
   };
 
   return (
-    <div>
+    <div role="main" aria-label="Patient Registration">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Patients</h1>
+        <h1
+          className="text-2xl font-bold"
+          onClick={() => {
+            toast.success("Patient Management System", {
+              id: "toast-1",
+            });
+          }}
+        >
+          Patients
+        </h1>
         <Dialog open={open} onOpenChange={handleDialogChange}>
           <DialogTrigger asChild>
-            <Button variant="outline">Add New Patient</Button>
+            <Button variant="outline" aria-haspopup="dialog">
+              Add New Patient
+            </Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent
+            className="sm:max-w-lg"
+            aria-modal="true"
+            role="dialog"
+          >
             <DialogHeader>
               <DialogTitle>Register New Patient</DialogTitle>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-6">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4 mt-6"
+              aria-describedby="form-description"
+            >
               <div>
-                <Input placeholder="First Name" {...register("firstName")} />
-                <ErrorMessage message={errors.firstName?.message} />
+                <Input
+                  placeholder="First Name"
+                  {...register("firstName")}
+                  aria-invalid={!!errors.firstName}
+                  aria-describedby="firstName-error"
+                />
+                <ErrorMessage
+                  message={errors.firstName?.message}
+                  id="firstName-error"
+                />
               </div>
 
               <div>
-                <Input placeholder="Last Name" {...register("lastName")} />
-                <ErrorMessage message={errors.lastName?.message} />
+                <Input
+                  placeholder="Last Name"
+                  {...register("lastName")}
+                  aria-invalid={!!errors.lastName}
+                  aria-describedby="lastName-error"
+                />
+                <ErrorMessage
+                  message={errors.lastName?.message}
+                  id="lastName-error"
+                />
               </div>
 
               <div>
-                <Input type="number" placeholder="Age" {...register("age")} />
-                <ErrorMessage message={errors.age?.message} />
+                <Input
+                  type="number"
+                  placeholder="Age"
+                  {...register("age")}
+                  aria-invalid={!!errors.age}
+                  aria-describedby="age-error"
+                />
+                <ErrorMessage message={errors.age?.message} id="age-error" />
               </div>
 
               <div>
@@ -122,7 +172,12 @@ const RegisterPatients = () => {
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger
+                        className="w-full"
+                        aria-label="Select Gender"
+                        aria-invalid={!!errors.gender}
+                        aria-describedby="gender-error"
+                      >
                         <SelectValue placeholder="Select Gender" />
                       </SelectTrigger>
                       <SelectContent>
@@ -137,7 +192,10 @@ const RegisterPatients = () => {
                     </Select>
                   )}
                 />
-                <ErrorMessage message={errors.gender?.message} />
+                <ErrorMessage
+                  message={errors.gender?.message}
+                  id="gender-error"
+                />
               </div>
 
               <div>
@@ -145,12 +203,26 @@ const RegisterPatients = () => {
                   placeholder="Contact Number"
                   type="tel"
                   {...register("contactNumber")}
+                  aria-invalid={!!errors.contactNumber}
+                  aria-describedby="contact-error"
                 />
-                <ErrorMessage message={errors.contactNumber?.message} />
+                <ErrorMessage
+                  message={errors.contactNumber?.message}
+                  id="contact-error"
+                />
               </div>
 
-              <Input placeholder="Email Address" {...register("email")} />
-              <Input placeholder="Address" {...register("address")} />
+              <Input
+                placeholder="Email Address"
+                {...register("email")}
+                aria-describedby="email-error"
+              />
+
+              <Input
+                placeholder="Address"
+                {...register("address")}
+                aria-describedby="address-error"
+              />
 
               <div>
                 <Controller
@@ -158,7 +230,12 @@ const RegisterPatients = () => {
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger
+                        className="w-full"
+                        aria-label="Select Blood Group"
+                        aria-invalid={!!errors.bloodGroup}
+                        aria-describedby="bloodGroup-error"
+                      >
                         <SelectValue placeholder="Select Blood Group" />
                       </SelectTrigger>
                       <SelectContent>
@@ -173,27 +250,40 @@ const RegisterPatients = () => {
                     </Select>
                   )}
                 />
-                <ErrorMessage message={errors.bloodGroup?.message} />
+                <ErrorMessage
+                  message={errors.bloodGroup?.message}
+                  id="bloodGroup-error"
+                />
               </div>
 
-              <Textarea
-                placeholder="Medical Conditions (comma-separated)"
-                {...register("medicalConditions")}
-              />
+              <div>
+                <Textarea
+                  placeholder="Medical Conditions (comma-separated)"
+                  {...register("medicalConditions")}
+                  aria-describedby="medicalConditions-help"
+                />
+                <p
+                  id="medicalConditions-help "
+                  className="text-sm text-muted-foreground mt-1"
+                >
+                  Separate each condition with a comma
+                </p>
+              </div>
 
-              <Button type="submit" disabled={isSubmitting} className="w-full">
+              <Button
+                type="submit"
+                aria-label="Submit Patient Registration"
+                disabled={isSubmitting}
+                className="w-full cursor-pointer"
+                aria-disabled={isSubmitting}
+                aria-busy={isSubmitting}
+              >
                 {isSubmitting ? "Saving..." : "Submit"}
               </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-md mb-6">
-          {error}
-        </div>
-      )}
     </div>
   );
 };

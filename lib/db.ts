@@ -13,7 +13,6 @@ export async function getDbConnection() {
       }
 
       db = new PGlite(dbpath);
-      console.log("Waiting for DB to be ready", await db.waitReady);
     }
 
     await initiateDB(db);

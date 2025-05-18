@@ -10,6 +10,10 @@ export const formatDate = (dateString: string) => {
 };
 
 export const parseMedicalConditions = (conditionsJson: string) => {
-  const conditions = JSON.parse(conditionsJson);
-  return Array.isArray(conditions) ? conditions.join(", ") : conditionsJson;
+  try {
+    const conditions = JSON.parse(conditionsJson);
+    return Array.isArray(conditions) ? conditions.join(", ") : conditionsJson;
+  } catch {
+    return conditionsJson;
+  }
 };
