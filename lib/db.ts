@@ -3,16 +3,33 @@ import { PGlite } from "@electric-sql/pglite";
 import { existsSync, mkdirSync } from "fs";
 
 let db: PGlite | null = null;
-const dbpath = path.join(process.cwd(), "db", "patients");
 
 export async function getDbConnection() {
   try {
     if (!db) {
-      if (!existsSync(dbpath)) {
-        mkdirSync(dbpath, { recursive: true });
+      const isProd = process.env.NODE_ENV === "production";
+
+      let dbDir = path.join(process.cwd(), "db", "patients");
+      let dbPath = path.join(process.cwd(), "db", "patients");
+
+      if (isProd) {
+        dbDir = path.join("/tmp", "db", "patients");
+        dbPath = `file:${dbDir}`;
       }
 
-      db = new PGlite(dbpath);
+      if (!existsSync(dbDir)) {
+        mkdirSync(dbDir, { recursive: true });
+      }
+
+      db = new PGlite(dbPath);
+
+      // const dbpath = path.join(process.cwd(), "db", "patients");
+      // if (!existsSync(dbpath)) {
+      //   mkdirSync(dbpath, { recursive: true });
+      // }
+      // console.log("Initializing DB", { dbpath });
+
+      // db = new PGlite(dbpath);
     }
 
     await initiateDB(db);
