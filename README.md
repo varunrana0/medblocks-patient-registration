@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏥 Patient Registration App
 
-## Getting Started
+A modern, frontend-only Patient Registration system built with **Next.js App Router**, **TypeScript**, **ShadCN UI**, and **Pglite**. It allows you to register, view, and search patients — with real-time **cross-tab synchronization** of search input using the **BroadcastChannel API**.
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+- ✅ Register new patients with form validation
+- ✅ View all patients in a searchable table
+- ✅ Real-time cross-tab search synchronization
+- ✅ Hybrid usage of Server and Client components with App Router
+- ✅ Fully local persistence using `pglite` (SQLite in the browser)
+- ✅ Accessible UI powered by ShadCN (Radix + TailwindCSS)
+- ✅ Built with a **modular structure** separating components, types, utilities, and logic.
+
+---
+
+## 🧰 Tech Stack
+
+| Tool                 | Purpose                          |
+| -------------------- | -------------------------------- |
+| Next.js (App Router) | Routing and rendering            |
+| TypeScript           | Static typing                    |
+| ShadCN UI            | Beautiful, accessible components |
+| Tailwind CSS         | Utility-first styling            |
+| Pglite               | SQLite embedded in browser       |
+| BroadcastChannel     | Sync search state across tabs    |
+
+---
+
+## 🛠️ Setup Instructions
+
+### 1. Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/patient-registration-app.git
+cd patient-registration-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+# or
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Run the Development Server
 
-## Learn More
+```bash
+pnpm dev
+# or
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Now open your browser and go to:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🧪 Usage Instructions
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Register a Patient**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   - Fill out the registration form on the homepage.
+   - Click "Submit" to save data locally using `pglite`.
+
+2. **View Patients**
+
+   - All patients are listed in a table with fields like name, age, gender, contact, blood group, etc.
+   - All Patients are automatically synced across all open tabs using **BroadcastChannel**.
+
+3. **Search Patients**
+   - Use the search input to filter patients by name, email, or contact number.
+   - The search term automatically syncs across all open tabs using **BroadcastChannel**.
+
+---
+
+## 📁 Project Structure
+
+```
+.
+├── app/
+│   └── page.tsx                            # Home page route
+├── components/
+│   └── Patients/                           # Table to display all patients
+│       ├── RegisterPatient.tsx             # Form to register patient
+│       └── PatientsTable.tsx               # Table to display all patients
+│       └── PatientsTableWrapper.tsx        # Wrapper for Patients React component
+│       └── Patient.schema.tsx              # Zod schema for patient data
+│       └── constant.ts                     # Patient Component constants
+│       └── types.ts                        # Shared type definitions
+├── actions/
+│   └── actions.ts                          # Server function to perform actions
+├── lib/
+│   └── db.ts                               # Database connection
+│   └── utils.ts                            # Helper functions
+└── SETUP_INSTRUCTIONS.md                               # You're here!
+```
+
+---
+
+## 🧐 Highlights
+
+🔄 **BroadcastChannel**
+
+- Ensures seamless tab-to-tab communication — e.g., Typing a search term in one tab updates the filter on all others.
+- Ensures seamless tab-to-tab communication — e.g., Newly registered patients are immediately reflected in all open tabs via `BroadcastChannel` for real-time updates.
+
+🌟 **ShadCN UI**
+
+- **Radix UI** for accessible UI components.
+- **Tailwind CSS** for utility-first styling.
+
+📚 **TypeScript**
+
+- **Static typing** for better code quality and maintainability.
+
+🚀 **Next.js App Router**
+
+- **Hybrid rendering** using Server and Client components.
+- **Modular structure** separating components, types, utilities, and logic.
+
+📦 **Pglite**
+
+- **SQLite** embedded in the browser.
+- **Real-time synchronization** using **BroadcastChannel** for cross-tab communication.
+
+🎉 **Modularity**
+
+- **Modular structure** separating components, types, utilities, and logic.
+
+---
