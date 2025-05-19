@@ -4,21 +4,21 @@
 
 While setting up the local Pglite database for our Patient Registration App (built with Next.js App Router), I encountered a few notable challenges related to path handling and environment configuration.
 
-### 🐛 The Problem
+### 🐛 The Initial Problem
 
-While trying to initialize a local file-based database `(/db/patients)` within the project directory using `PGlite`.
+While trying to initialize a local file-based database (`/db/patients`) within the project directory using `PGlite`, the following error was thrown:
 
 ```
 TypeError: The "path" argument must be of type string or an instance of Buffer or URL. Received an instance of URL
 ```
 
-This occurred because in a **Next.js App Router** environment, modules can behave differently due to the mixed execution contexts (edge/server/browser), especially when working with filesystem modules like `path`, `fs`, and custom native packages.
+This occurred because in a **Next.js App Router** environment, modules can behave differently due to mixed execution contexts (Edge/Server/Browser), especially when working with filesystem modules like `path`, `fs`, and custom native packages.
 
 The `PGlite` package requires a valid file path to store the database locally. However, by default, when using `process.cwd()` and `path.join`, Next.js failed to interpret this correctly in the new server context.
 
-### ✅ The Solution
+### ✅ Local Development Fix
 
-To resolve this, I had to inform Next.js explicitly to allow server-only packages like `@electric-sql/pglite` by configuring `next.config.ts` as follows:
+To resolve this locally, I had to inform Next.js explicitly to treat server-only packages like `@electric-sql/pglite` correctly by configuring `next.config.ts` as follows:
 
 ```ts
 import type { NextConfig } from "next";
@@ -32,9 +32,7 @@ export default nextConfig;
 
 This directive ensures that Next.js handles the Pglite package as a server-side dependency only, and does not try to bundle or evaluate it in environments where filesystem access is restricted (like the Edge runtime).
 
-### 📁 Additional Safeguard
-
-I also added a filesystem check to create the DB directory if it doesn’t exist:
+Additionally, to avoid any runtime errors, I added a safeguard check:
 
 ```ts
 if (!existsSync(dbpath)) {
@@ -42,11 +40,46 @@ if (!existsSync(dbpath)) {
 }
 ```
 
-With this in place, the DB now initializes correctly without runtime errors, and I can safely persist patient data locally using Pglite.
+This ensured the DB directory exists before attempting to initialize the database.
+
+### 🚨 New Problem on Vercel Deployment
+
+While everything worked fine locally, the Vercel deployment failed with this error:
+
+```
+Error: ENOENT: no such file or directory, mkdir '/var/task/db/patients'
+```
+
+### 🧠 Root Cause
+
+Vercel runs applications in a **read-only serverless environment** where you can only write to `/tmp`. Our code used `process.cwd()` to build the DB path, which resolved to `/var/task`, a read-only directory.
+
+Attempting to create or write to any path under this root caused runtime errors.
+
+### 🛠️ Final Fix for Vercel Compatibility
+
+To solve this, I implemented a conditional path based on the environment:
+
+```ts
+const isProd = process.env.NODE_ENV === "production";
+let dbDir = path.join(isProd ? "/tmp" : process.cwd(), "db", "patients");
+
+if (!existsSync(dbDir)) {
+  mkdirSync(dbDir, { recursive: true });
+}
+
+db = new PGlite(dbDir);
+```
+
+### 🎯 Result
+
+- ✅ Local development uses `process.cwd()` to store DB files.
+- ✅ Vercel production uses `/tmp`, the only writable location.
+- ✅ Resolved deployment crash caused by file system restrictions.
 
 ---
 
-This setup proved essential in enabling a fast and reliable local-first database experience in a modern hybrid-rendered React application.
+This journey served as a solid reminder that **serverless platforms like Vercel require special attention for file-system dependent features** like local SQLite (Pglite). Thankfully, a small tweak in environment handling was enough to make our app portable and production-ready.
 
 ---
 
